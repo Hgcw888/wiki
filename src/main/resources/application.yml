@@ -10,3 +10,4 @@ server:
 logging:
   pattern:
     console: "[%thread] %-5level %logger{36} - %msg%n"
+
