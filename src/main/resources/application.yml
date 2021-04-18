@@ -11,3 +11,7 @@ logging:
   pattern:
     console: "[%thread] %-5level %logger{36} - %msg%n"
 
+#配置mybatis所有mapper.xml所在的文件路肩
+mybatis:
+  mapper-locations: classpath:/mapper/**/*.xml
+
