@@ -1,0 +1,4 @@
+GET http://localhost:8080/categoty/dimSelect?page=1&size=10
+Accept: application/json
+
+###

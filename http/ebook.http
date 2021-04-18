@@ -1,0 +1,17 @@
+GET http://localhost:8080/api/selectList
+Accept: application/json
+
+###
+GET http://localhost:8080/api/dimSelect
+Content-Type: application/x-www-form-urlencoded
+
+
+
+
+###
+GET http://localhost:8080/api/dimSelect?page=1&size=1000
+Accept: application/json
+
+###
+GET http://localhost:8080/category/dimSelect?page=1&size=1000
+Accept: application/json

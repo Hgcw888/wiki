@@ -7,11 +7,16 @@ spring:
 server:
   port: 8080
 
-logging:
-  pattern:
-    console: "[%thread] %-5level %logger{36} - %msg%n"
+#logging:
+#  pattern:
+#    console: "[%thread] %-5level %logger{36} - %msg%n"
 
 #配置mybatis所有mapper.xml所在的文件路肩
 mybatis:
   mapper-locations: classpath:/mapper/**/*.xml
-
+#打印所有mysql日志：sql，参数，结果
+logging:
+  pattern:
+    console: "[%thread] %-5level %logger{36} - %msg%n"
+  level:
+    com.hgcw.wiki.mapper: trace
