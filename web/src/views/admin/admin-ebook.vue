@@ -48,7 +48,7 @@
         <!--删除，编辑按钮-->
         <template v-slot:action="{text,record}">
           <a-space size="small">
-            <router-link to="/admin/doc">
+            <router-link :to="'/admin/doc?ebookId='+ record.id">
               <a-button type="primary">
                 文档管理
               </a-button>
@@ -187,7 +187,7 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(categorys, 0);
           console.log("树形结构:", level1.value);
-            //菜单列表再查询电子书列表
+          //菜单列表再查询电子书列表
           handleQuery({
             page: 1,
             size: pagination.value.pageSize

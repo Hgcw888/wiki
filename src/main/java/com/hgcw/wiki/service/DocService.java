@@ -19,5 +19,7 @@ public interface DocService {
 
     void delectDoc(Long id);
 
+    void delectDoc(List<String> ids);
+
     void updateDoc(DocSaveReq docQueryReq);
 }

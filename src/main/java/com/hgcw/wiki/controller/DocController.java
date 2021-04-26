@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -51,16 +52,17 @@ public class DocController {
     }
 
     /**
-     * 删除电子书
+     * 删除文档，因为删除父类节点时也要讲其下的子类删除
      */
-    @DeleteMapping("delectDoc/{id}")
-    public CommonResp delectDoc(@PathVariable Long id) {
+    @DeleteMapping("delectDoc/{ids}")
+    public CommonResp delectDoc(@PathVariable String ids) {
         CommonResp objectCommonResp = new CommonResp<>();
-        docService.delectDoc(id);
+        List<String> strings = Arrays.asList(ids.split(","));
+        docService.delectDoc(strings);
         return objectCommonResp;
     }
     /**
-     * 编辑电子书
+     * 编辑文档
      * @Valid 实体类设定的字段是否为空
      */
     @PostMapping("/updateDoc")

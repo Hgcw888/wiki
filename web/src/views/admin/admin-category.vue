@@ -147,6 +147,8 @@ export default defineComponent({
      */
     const handleQuery = () => {
       loading.value = true;
+      //情况数据，如果不情况现有的数据，则编辑报错从新加载后，在点击编辑，则列表显示的还是编辑签的数据
+      level1.value = [];
       axios.get("/categoty/selectList").then((response) => {
         loading.value = false;
         const date = response.data;

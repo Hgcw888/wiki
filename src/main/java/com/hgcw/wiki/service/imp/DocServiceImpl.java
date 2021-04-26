@@ -77,7 +77,7 @@ public class DocServiceImpl implements DocService {
     }
 
     /**
-     * 删除电子书
+     * 删除文档
      *
      * @param id
      */
@@ -86,8 +86,23 @@ public class DocServiceImpl implements DocService {
         docMapper.deleteByPrimaryKey(id);
     }
 
+
     /**
-     * 更新和添加电子书
+     * 删除文档,删除父节点的时候需要将其子类一起删掉
+     *
+     * @param 
+     */
+    @Override
+    public void delectDoc(List<String> ids) {
+        DocExample docExample = new DocExample();
+        DocExample.Criteria criteria = docExample.createCriteria();
+        criteria.andIdIn(ids);
+        docMapper.deleteByExample(docExample);
+    }
+
+
+    /**
+     * 更新和添加文档
      *
      * @param
      */
