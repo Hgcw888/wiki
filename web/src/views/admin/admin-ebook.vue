@@ -40,10 +40,21 @@
         <template #cover="{ text: cover}">
           <img v-if="cover" :src="cover" alt="avatar"/>
         </template>
+        <!--        讲两个分类作为一个组件-->
+        <template v-slot:category="{text,record}">
+          <span>{{ getCategoryName(record.category1Id) }}/{{ getCategoryName(record.category2Id) }}</span>
+        </template>
 
         <!--删除，编辑按钮-->
         <template v-slot:action="{text,record}">
           <a-space size="small">
+            <router-link to="/admin/doc">
+              <a-button type="primary">
+                文档管理
+              </a-button>
+            </router-link>
+
+
             <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
@@ -79,12 +90,14 @@
       <a-form-item label="名称">
         <a-input v-model:value="ebook.name"/>
       </a-form-item>
-      <a-form-item label="分类一">
-        <a-input v-model:value="ebook.category1Id"/>
+      <a-form-item label="分类">
+        <a-cascader v-model:value="categoryIds"
+                    :field-names="{ label:'name',value:'id',children:'children'}"
+                    :options="level1"
+        />
+
       </a-form-item>
-      <a-form-item label="分类二">
-        <a-input v-model:value="ebook.category2Id"/>
-      </a-form-item>
+
       <a-form-item label="描述">
         <a-input v-model:value="ebook.description" style="height: 100px;width: 450px"/>
       </a-form-item>
@@ -132,14 +145,8 @@ export default defineComponent({
         dataIndex: 'name',
       },
       {
-        title: '分类1',
-        key: 'category1Id',
-        dataIndex: 'category1Id',
-      },
-      {
-        title: '分类2',
-        key: 'category2Id',
-        dataIndex: 'category2Id',
+        title: '分类',
+        slots: {customRender: 'category'}
       },
       {
         title: '文档数',
@@ -161,12 +168,61 @@ export default defineComponent({
         }
       }
     ];
+
+    const level1 = ref();//一级分类树，children属性就是二级分类
+    let categorys: any;//分类结合成一个显示使用的对象
+    /**
+     * 用来查询所有的分类，分类框的分类特用
+     */
+    const handleQueryCatergory = () => {
+      loading.value = true;
+      axios.get("/categoty/selectList").then((response) => {
+        loading.value = false;
+        const date = response.data;
+        //判断符合实体类中的参数校验
+        if (date.success) {
+          categorys = date.content;
+          //进行树形结构
+          console.log("原始数组:", categorys);
+          level1.value = [];
+          level1.value = Tool.array2Tree(categorys, 0);
+          console.log("树形结构:", level1.value);
+            //菜单列表再查询电子书列表
+          handleQuery({
+            page: 1,
+            size: pagination.value.pageSize
+          });
+
+        } else {
+          //如果没有的话返回实体类错误提示
+          message.error(date.message)
+        }
+      });
+    };
+
+    /**
+     * 讲分类合并成一个组显示。通过他的分类id相应分类级别查出名字
+     *
+     */
+    const getCategoryName = (cid: number) => {
+      let result = "";
+      categorys.forEach((item: any) => {
+        if (item.id === cid) {
+          result = item.name;
+        }
+      });
+      return result;
+    };
+
+
     /**
      * 获取ebook列表，p为传回对象,传入axios的data请求中
      * @param params
      */
     const handleQuery = (params: any) => {
       loading.value = true;
+      //情况数据，如果不情况现有的数据，则编辑报错从新加载后，在点击编辑，则列表显示的还是编辑签的数据
+      ebooks.value = [];
       axios.get("/api/dimSelect", {
 
         params: {
@@ -198,6 +254,7 @@ export default defineComponent({
      */
     const handleQuery1 = (params: any) => {
       loading.value = true;
+
       axios.get("/api/dimSelect", {
 
         params: {
@@ -237,12 +294,16 @@ export default defineComponent({
     /**
      * 表单弹框
      * ebook接受表单回传数据
+     * categoryIds数组【100,101】对应的就是：前端开发/vue
      */
-    const ebook = ref({});
+    const categoryIds = ref();
+    const ebook = ref();
     const modelVisible = ref(false)//框
     const modelLoading = ref(false)
     const handleModelOk = () => {
       modelLoading.value = true;
+      ebook.value.category1Id = categoryIds.value[0];
+      ebook.value.category2Id = categoryIds.value[1];
       axios.post("/api/updateEbook", ebook.value).then((response) => {
         //有返回数据的话就关闭modelLoading
         modelLoading.value = false;
@@ -268,6 +329,7 @@ export default defineComponent({
     const edit = (record: any) => {
       modelVisible.value = true
       ebook.value = Tool.copy(record);
+      categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
     };
     /**
      * 删除电子书
@@ -300,12 +362,13 @@ export default defineComponent({
 
     //初始化去查询
     onMounted(() => {
-      handleQuery({
-        page: 1,
-        size: pagination.value.pageSize
-      });
+      //初始化先查出所有分类
+      handleQueryCatergory();
+
     });
     return {
+      categoryIds,
+      level1,
       param,
       ebooks,
       pagination,
@@ -322,6 +385,8 @@ export default defineComponent({
       handleDelete,
       handleQuery,
       handleQuery1,
+      handleQueryCatergory,
+      getCategoryName
     }
   }
 });

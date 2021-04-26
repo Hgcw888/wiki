@@ -41,9 +41,14 @@ public class EbookServiceImpl implements EbookService {
     public PageResp<EbookQueryResp> dimSelect(EbookQueryReq req) {
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
+        //如果有值判断是否是name如果是就是调用了通过name查询的电子书
         if (!ObjectUtils.isEmpty(req.getName())) {
             criteria.andNameLike("%" + req.getName() + "%");
 
+        }
+        //如果有值判断是否是Category2Id如果是就是调用了点击二级分类获取电子书
+        if (!ObjectUtils.isEmpty(req.getCategory2Id())) {
+            criteria.andCategory2IdEqualTo(req.getCategory2Id());
         }
         PageHelper.startPage(req.getPage(), req.getSize());
         List<Ebook> ebooksList = ebookMapper.selectByExample(ebookExample);

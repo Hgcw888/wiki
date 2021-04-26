@@ -60,32 +60,32 @@
     </a-layout-content>
   </a-layout>
   <a-modal
-      title="分类表单"
+      title="文档表单"
       v-model:visible="modelVisible"
       :confirm-loading="modelLoading"
       @ok="handleModelOk"
   >
-    <a-form :model="category" :label-col="{span:6}" :wrapper-col="{span: 18}">
+    <a-form :model="doc" :label-col="{span:6}" :wrapper-col="{span: 18}">
 
       <a-form-item label="名称">
-        <a-input v-model:value="category.name"/>
+        <a-input v-model:value="doc.name"/>
 
       </a-form-item>
-      <a-form-item label="父分类">
-<!--        <a-input v-model:value="category.parent"/>-->
+      <a-form-item label="父文档">
+<!--        <a-input v-model:value="doc.parent"/>-->
         <a-select
-            v-model:value="category.parent"
+            v-model:value="doc.parent"
             ref="select"
         >
           <a-select-option value="0">
             无
           </a-select-option>
-          <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="category.id === c.id">{{ c.name }}
+          <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="doc.id === c.id">{{ c.name }}
           </a-select-option>
         </a-select>
       </a-form-item>
       <a-form-item label="排序">
-        <a-input v-model:value="category.sort"/>
+        <a-input v-model:value="doc.sort"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -99,7 +99,7 @@ import {Tool} from "@/util/tool";
 
 export default defineComponent({
   // 路由名称
-  name: 'AdminCategory',
+  name: 'AdminDoc',
   // setup初始化方法
 
   setup() {
@@ -109,7 +109,7 @@ export default defineComponent({
     param.value = {};
 
     //定于响应式变量（ref()）不需要执行方法，改变的数据会随着你的改变而改变，接受数据
-    const categorys = ref();
+    const docs = ref();
 
 //定义m默认延迟加载
     const loading = ref(false);
@@ -121,7 +121,7 @@ export default defineComponent({
         dataIndex: 'name',
       },
       {
-        title: '父分类',
+        title: '父文档',
         key: 'parent',
         dataIndex: 'parent',
       },
@@ -140,23 +140,23 @@ export default defineComponent({
     ];
 
 
-    const level1 = ref();//一级分类树，children属性就是二级分类
+    const level1 = ref();//一级文档树，children属性就是二级文档
     /**
-     * 获取category列表，p为传回对象,传入axios的data请求中
+     * 获取doc列表，p为传回对象,传入axios的data请求中
      * @param params
      */
     const handleQuery = () => {
       loading.value = true;
-      axios.get("/categoty/selectList").then((response) => {
+      axios.get("/doc/selectList").then((response) => {
         loading.value = false;
         const date = response.data;
         //判断符合实体类中的参数校验
         if (date.success) {
-          categorys.value = date.content;
+          docs.value = date.content;
           //进行树形结构
-          console.log("原始数组:", categorys.value);
+          console.log("原始数组:", docs.value);
           level1.value = [];
-          level1.value = Tool.array2Tree(categorys.value, 0);
+          level1.value = Tool.array2Tree(docs.value, 0);
           console.log("树形结构:", level1);
         } else {
           //如果没有的话返回实体类错误提示
@@ -165,17 +165,16 @@ export default defineComponent({
       });
     };
 
-
     /**
      * 表单弹框
-     * category接受表单回传数据
+     * doc接受表单回传数据
      */
-    const category = ref({});
+    const doc = ref({});
     const modelVisible = ref(false)//框
     const modelLoading = ref(false)
     const handleModelOk = () => {
       modelLoading.value = true;
-      axios.post("/categoty/updateCategory", category.value).then((response) => {
+      axios.post("/doc/updateDoc", doc.value).then((response) => {
         //有返回数据的话就关闭modelLoading
         modelLoading.value = false;
         const data = response.data//commonResp数据
@@ -192,20 +191,20 @@ export default defineComponent({
     };
     /**
      * 编辑
-     * 将表单接收的到的参数record赋值到category中
+     * 将表单接收的到的参数record赋值到doc中
      */
     const edit = (record: any) => {
       modelVisible.value = true
-      category.value = Tool.copy(record);
+      doc.value = Tool.copy(record);
     };
     /**
-     * 删除分类
-     * 将表单接收的到的参数record赋值到category中
+     * 删除文档
+     * 将表单接收的到的参数record赋值到doc中
      * any支持所有类型
      * Long类型使用number
      */
     const handleDelete = (id: number) => {
-      axios.delete("/categoty/delectCategory/" + id).then((response) => {
+      axios.delete("/doc/delectDoc/" + id).then((response) => {
         const data = response.data//commonResp数据返回参数头
         if (data.success) {
           //添加成功后从新调用获取列表方法
@@ -216,11 +215,11 @@ export default defineComponent({
 
     /**
      * 新增
-     * 表单为空数组，来接收categorys填入的参数
+     * 表单为空数组，来接收docs填入的参数
      */
     const add = () => {
       modelVisible.value = true
-      category.value = {};
+      doc.value = {};
     };
 
 
@@ -231,14 +230,14 @@ export default defineComponent({
     return {
       level1,
       param,
-      // categorys,
+      // docs,
       columns,
       loading,
       edit,
       modelVisible,
       modelLoading,
       handleModelOk,
-      category,
+      doc,
 
       add,
       handleDelete,
