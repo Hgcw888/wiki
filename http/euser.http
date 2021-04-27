@@ -1,0 +1,4 @@
+GET http://localhost:8080/euser/dimSelect?loginName=test
+Accept: application/json
+
+###
