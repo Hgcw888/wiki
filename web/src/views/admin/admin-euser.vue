@@ -95,6 +95,8 @@ import {defineComponent, onMounted, ref,} from 'vue';
 import axios from "axios";
 import {message} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
+declare let hexMd5:any;
+declare let KEY:any;
 
 
 export default defineComponent({
@@ -231,6 +233,9 @@ export default defineComponent({
     const handleModelOk = () => {
       modelLoading.value = true;
       axios.post("/euser/updateEuser", euser.value).then((response) => {
+        //密码加密传输应用js文件的md5.js中的方法
+        euser.value.password=hexMd5(euser.value.password + KEY);
+
         //有返回数据的话就关闭modelLoading
         modelLoading.value = false;
         const data = response.data//commonResp数据

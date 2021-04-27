@@ -100,10 +100,11 @@ public class EuserServiceImpl implements EuserService {
              //新增对象id有三种：id自增，uuid，雪花算法新增
              euser.setId(snowFlake.nextId());
              euserMapper.insert(euser);
-         }
-         //用户名已存在
-            throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+         }else {
+             //用户名已存在
+             throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
 
+         }
         } else {
             //否则为更新,不能更改loginname
             euser.setLoginName(null);

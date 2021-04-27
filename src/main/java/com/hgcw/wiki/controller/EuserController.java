@@ -8,6 +8,7 @@ import com.hgcw.wiki.resp.EuserQueryResp;
 import com.hgcw.wiki.resp.PageResp;
 import com.hgcw.wiki.service.EuserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -61,6 +62,8 @@ public class EuserController {
      */
     @PostMapping("/updateEuser")
     public CommonResp updateEuser(@Valid  @RequestBody EuserSaveReq euserSaveReq){
+        //传入密码加密
+        euserSaveReq.setPassword(DigestUtils.md5DigestAsHex(euserSaveReq.getPassword().getBytes()));
         CommonResp resp = new CommonResp<>();
         euserService.updateEuser(euserSaveReq);
         return resp;
