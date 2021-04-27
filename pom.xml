@@ -15,9 +15,15 @@
     <description>hgcw Wiki</description>
     <properties>
         <java.version>1.8</java.version>
-    </properties>
+    </properties>；
 
     <dependencies>
+<!--        jwt,token依赖-->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.5.0</version>
+        </dependency>
 <!--        参数校验-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

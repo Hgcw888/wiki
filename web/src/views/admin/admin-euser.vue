@@ -48,6 +48,9 @@
         <!--删除，编辑按钮-->
         <template v-slot:action="{text,record}">
           <a-space size="small">
+            <a-button type="primary" @click="resetPassword(record)">
+              重置密码
+            </a-button>
             <a-button type="primary" @click="edit(record)">
               编辑
             </a-button>
@@ -77,26 +80,39 @@
   >
     <a-form :model="euser" :label-col="{span:6}">
       <a-form-item label="登陆名">
-<!--        disabled="euser.id"如果有值就不能修改，没有就可以-->
+        <!-- 新增的话没有id，编辑有id       disabled="euser.id"如果有值就不能修改，没有就可以. v-show="!euser.id"不显示-->
         <a-input v-model:value="euser.loginName" :disabled="!!euser.id"/>
       </a-form-item>
       <a-form-item label="昵称">
         <a-input v-model:value="euser.name"/>
       </a-form-item>
-      <a-form-item label="密码">
+      <a-form-item label="密码" v-show="!euser.id">
         <a-input v-model:value="euser.password"/>
       </a-form-item>
-
     </a-form>
   </a-modal>
+  <a-modal
+      title="重置密码"
+      v-model:visible="resetModelVisible"
+      :confirm-loading="resetModelLoading"
+      @ok="handlerResetModelOk"
+  >
+    <a-form :model="euser" :label-col="{span:6}">
+      <a-form-item label="新密码">
+        <a-input v-model:value="euser.password"/>
+      </a-form-item>
+    </a-form>
+  </a-modal>
+
 </template>
 <script lang="ts">
 import {defineComponent, onMounted, ref,} from 'vue';
 import axios from "axios";
 import {message} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
-declare let hexMd5:any;
-declare let KEY:any;
+
+declare let hexMd5: any;
+declare let KEY: any;
 
 
 export default defineComponent({
@@ -145,8 +161,6 @@ export default defineComponent({
     ];
 
 
-
-
     /**
      * 获取euser列表，p为传回对象,传入axios的data请求中
      * @param params
@@ -185,7 +199,7 @@ export default defineComponent({
      */
     const handleQuery1 = (params: any) => {
       loading.value = true;
-
+      param.value.loginName=null;
       axios.get("/euser/dimSelect", {
 
         params: {
@@ -234,7 +248,7 @@ export default defineComponent({
       modelLoading.value = true;
       axios.post("/euser/updateEuser", euser.value).then((response) => {
         //密码加密传输应用js文件的md5.js中的方法
-        euser.value.password=hexMd5(euser.value.password + KEY);
+        euser.value.password = hexMd5(euser.value.password + KEY);
 
         //有返回数据的话就关闭modelLoading
         modelLoading.value = false;
@@ -289,6 +303,43 @@ export default defineComponent({
       euser.value = {};
     };
 
+    /**
+     * 重置密码
+     */
+    const resetModelVisible = ref(false)//框
+    const resetModelLoading = ref(false)
+    const handlerResetModelOk = () => {
+      resetModelLoading.value = true;
+      axios.post("/euser/updatepassword", euser.value).then((response) => {
+        //密码加密传输应用js文件的md5.js中的方法
+        euser.value.password = hexMd5(euser.value.password + KEY);
+
+        //有返回数据的话就关闭modelLoading
+        resetModelLoading.value = false;
+        const data = response.data//commonResp数据
+        //判断符合实体类中的参数校验
+        if (data.success) {
+          resetModelVisible.value = false;//框
+          //添加成功后从新调用获取列表方法
+          handleQuery({
+            page: pagination.value.current,
+            size: pagination.value.pageSize
+          });
+        } else {
+          //如果没有的话返回实体类错误提示
+          message.error(data.message)
+        }
+      });
+    };
+    /**
+     * 编辑密码
+     */
+    const resetPassword = (record: any) => {
+      resetModelVisible.value = true
+      euser.value = Tool.copy(record);
+      euser.value.password = null;
+    };
+
 
     //初始化去查询
     onMounted(() => {
@@ -315,6 +366,10 @@ export default defineComponent({
       handleDelete,
       handleQuery,
       handleQuery1,
+      resetPassword,
+      handlerResetModelOk,
+      resetModelVisible,
+      resetModelLoading,
     }
   }
 });

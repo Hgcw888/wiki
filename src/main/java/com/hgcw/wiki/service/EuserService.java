@@ -2,6 +2,7 @@ package com.hgcw.wiki.service;
 
 import com.hgcw.wiki.domin.Euser;
 import com.hgcw.wiki.req.EuserQueryReq;
+import com.hgcw.wiki.req.EuserResetPasswordReq;
 import com.hgcw.wiki.req.EuserSaveReq;
 import com.hgcw.wiki.resp.EuserQueryResp;
 import com.hgcw.wiki.resp.PageResp;
@@ -13,6 +14,8 @@ import java.util.List;
  * @date 2021/4/18 21:35
  */
 public interface EuserService {
+   void updatepassword(EuserResetPasswordReq euserResetPasswordReq);
+
     List<Euser> selectList();
 
     PageResp<EuserQueryResp> dimSelect(EuserQueryReq req);

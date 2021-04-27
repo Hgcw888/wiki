@@ -2,10 +2,12 @@ package com.hgcw.wiki.controller;
 
 import com.hgcw.wiki.domin.Euser;
 import com.hgcw.wiki.req.EuserQueryReq;
+import com.hgcw.wiki.req.EuserResetPasswordReq;
 import com.hgcw.wiki.req.EuserSaveReq;
 import com.hgcw.wiki.resp.CommonResp;
 import com.hgcw.wiki.resp.EuserQueryResp;
 import com.hgcw.wiki.resp.PageResp;
+import com.hgcw.wiki.service.EbookService;
 import com.hgcw.wiki.service.EuserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
@@ -67,5 +69,16 @@ public class EuserController {
         CommonResp resp = new CommonResp<>();
         euserService.updateEuser(euserSaveReq);
         return resp;
+    }
+
+    /**
+     * 修改密码接口
+     */
+    @PostMapping("/updatepassword")
+    public CommonResp updatepassword(@Valid @RequestBody EuserResetPasswordReq euserResetPasswordReq){
+        euserResetPasswordReq.setPassword(DigestUtils.md5DigestAsHex(euserResetPasswordReq.getPassword().getBytes()));
+        CommonResp objectCommonResp = new CommonResp<>();
+        euserService.updatepassword(euserResetPasswordReq);
+        return objectCommonResp;
     }
 }

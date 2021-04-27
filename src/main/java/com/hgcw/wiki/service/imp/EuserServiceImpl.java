@@ -8,6 +8,7 @@ import com.hgcw.wiki.exception.BusinessException;
 import com.hgcw.wiki.exception.BusinessExceptionCode;
 import com.hgcw.wiki.mapper.EuserMapper;
 import com.hgcw.wiki.req.EuserQueryReq;
+import com.hgcw.wiki.req.EuserResetPasswordReq;
 import com.hgcw.wiki.req.EuserSaveReq;
 import com.hgcw.wiki.resp.EuserQueryResp;
 import com.hgcw.wiki.resp.PageResp;
@@ -31,6 +32,17 @@ public class EuserServiceImpl implements EuserService {
     private EuserMapper euserMapper;
     @Autowired
     private SnowFlake snowFlake;
+
+    /**
+     * 重置密码
+     *
+     * @param euserResetPasswordReq
+     */
+    @Override
+    public void updatepassword(EuserResetPasswordReq euserResetPasswordReq) {
+        Euser copy = CopyUtil.copy(euserResetPasswordReq, Euser.class);
+        euserMapper.updateByPrimaryKeySelective(copy);
+    }
 
     @Override
     public List<Euser> selectList() {
@@ -95,19 +107,20 @@ public class EuserServiceImpl implements EuserService {
         //方法参数类型不同需要转换
         Euser euser = CopyUtil.copy(euserSaveReq, Euser.class);
         if (ObjectUtils.isEmpty(euserSaveReq.getId())) {
-         if (ObjectUtils.isEmpty( selectLogName(euserSaveReq.getLoginName()))){
-             //传入的id为空的为新增
-             //新增对象id有三种：id自增，uuid，雪花算法新增
-             euser.setId(snowFlake.nextId());
-             euserMapper.insert(euser);
-         }else {
-             //用户名已存在
-             throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+            if (ObjectUtils.isEmpty(selectLogName(euserSaveReq.getLoginName()))) {
+                //传入的id为空的为新增
+                //新增对象id有三种：id自增，uuid，雪花算法新增
+                euser.setId(snowFlake.nextId());
+                euserMapper.insert(euser);
+            } else {
+                //用户名已存在
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
 
-         }
+            }
         } else {
-            //否则为更新,不能更改loginname
+            //否则为更新,不能更改loginname,Password
             euser.setLoginName(null);
+            euser.setPassword(null);
             euserMapper.updateByPrimaryKeySelective(euser);
         }
 
@@ -115,6 +128,7 @@ public class EuserServiceImpl implements EuserService {
 
     /**
      * 查询用户名是否存在
+     *
      * @param loginName
      * @return
      */

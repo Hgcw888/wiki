@@ -254,7 +254,7 @@ export default defineComponent({
      */
     const handleQuery1 = (params: any) => {
       loading.value = true;
-
+      param.value.name=null;
       axios.get("/api/dimSelect", {
 
         params: {
