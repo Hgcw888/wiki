@@ -51,9 +51,10 @@
   </a-layout-header>
 </template>
 <script lang="ts">
-import {defineComponent, ref} from 'vue';
+import {computed, defineComponent, ref} from 'vue';
 import axios from "axios";
 import {message} from 'ant-design-vue';
+import store from '@/store';
 
 // 密码传输加密
 declare let hexMd5: any;
@@ -62,9 +63,11 @@ declare let KEY: any;
 export default defineComponent({
   name: 'the-header',
   setup() {
-    //登录成功后接受登录这的信息
-    const euser = ref();
-    euser.value = {};
+
+
+//登录成功后接受登录这的信息,全局变量监听
+    const euser = computed(() => store.state.euser);
+
     //loginEuser登录输入的值
     const loginEuser = ref({
       loginName: "",
@@ -90,8 +93,11 @@ export default defineComponent({
           //有值代表成功了，关闭弹框
           loginModalVisible.value = false;
           message.success("登陆成功");
-          //赋值给接受参数的对象
-          euser.value=data.content;
+
+
+          //将登录这的信息赋值到全局变量,传入setEuser方法
+          store.commit("setEuser", data.content);
+
         } else {
           message.error(data.message);
         }
@@ -104,6 +110,7 @@ export default defineComponent({
       euser,
       showLoginModal,
       login,
+
     }
   }
 
