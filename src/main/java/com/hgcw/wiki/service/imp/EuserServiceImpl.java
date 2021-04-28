@@ -7,18 +7,22 @@ import com.hgcw.wiki.domin.EuserExample;
 import com.hgcw.wiki.exception.BusinessException;
 import com.hgcw.wiki.exception.BusinessExceptionCode;
 import com.hgcw.wiki.mapper.EuserMapper;
+import com.hgcw.wiki.req.EuserLoginReq;
 import com.hgcw.wiki.req.EuserQueryReq;
 import com.hgcw.wiki.req.EuserResetPasswordReq;
 import com.hgcw.wiki.req.EuserSaveReq;
+import com.hgcw.wiki.resp.EuserLoginResp;
 import com.hgcw.wiki.resp.EuserQueryResp;
 import com.hgcw.wiki.resp.PageResp;
 import com.hgcw.wiki.service.EuserService;
 import com.hgcw.wiki.util.CopyUtil;
 import com.hgcw.wiki.util.SnowFlake;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import sun.rmi.runtime.Log;
 
 import java.util.List;
 
@@ -27,6 +31,7 @@ import java.util.List;
  * @date 2021/4/18 21:35
  */
 @Service
+@Slf4j
 public class EuserServiceImpl implements EuserService {
     @Autowired
     private EuserMapper euserMapper;
@@ -142,6 +147,29 @@ public class EuserServiceImpl implements EuserService {
             return null;
         } else {
             return eusers.get(0);
+        }
+    }
+
+    /**
+     * 登录方法
+     *
+     * @param euserLoginReq
+     * @return
+     */
+    @Override
+    public EuserLoginResp login(EuserLoginReq euserLoginReq) {
+        Euser euser = selectLogName(euserLoginReq.getLoginName());
+        if (ObjectUtils.isEmpty(euser)) {
+            log.info("用户名不存在，{}",euserLoginReq.getLoginName());
+            throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+        } else {
+            if (euser.getPassword().equals(euserLoginReq.getPassword())) {
+                EuserLoginResp loginResp = CopyUtil.copy(euser, EuserLoginResp.class);
+                return loginResp;
+            } else {
+                log.info("密码不对，请输入正确密码：{}，数据库密码：{}", euserLoginReq.getPassword(), euser.getPassword());
+                throw new BusinessException(BusinessExceptionCode.LOGIN_USER_ERROR);
+            }
         }
     }
 

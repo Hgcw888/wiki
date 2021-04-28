@@ -246,10 +246,10 @@ export default defineComponent({
     const modelLoading = ref(false)
     const handleModelOk = () => {
       modelLoading.value = true;
-      axios.post("/euser/updateEuser", euser.value).then((response) => {
-        //密码加密传输应用js文件的md5.js中的方法
-        euser.value.password = hexMd5(euser.value.password + KEY);
+      //密码加密传输应用js文件的md5.js中的方法
+      euser.value.password = hexMd5(euser.value.password + KEY);
 
+      axios.post("/euser/updateEuser", euser.value).then((response) => {
         //有返回数据的话就关闭modelLoading
         modelLoading.value = false;
         const data = response.data//commonResp数据
@@ -310,9 +310,10 @@ export default defineComponent({
     const resetModelLoading = ref(false)
     const handlerResetModelOk = () => {
       resetModelLoading.value = true;
+      //密码加密传输应用js文件的md5.js中的方法
+      euser.value.password = hexMd5(euser.value.password + KEY);
+
       axios.post("/euser/updatepassword", euser.value).then((response) => {
-        //密码加密传输应用js文件的md5.js中的方法
-        euser.value.password = hexMd5(euser.value.password + KEY);
 
         //有返回数据的话就关闭modelLoading
         resetModelLoading.value = false;

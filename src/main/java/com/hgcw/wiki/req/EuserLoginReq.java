@@ -2,6 +2,7 @@ package com.hgcw.wiki.req;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -11,10 +12,10 @@ import javax.validation.constraints.Pattern;
 @Data
 public class EuserLoginReq {
 
-    @NotNull(message = "【登陆名】不能为空")
+    @NotEmpty(message = "【登陆名】不能为空")
     private String loginName;
 
-    @NotNull(message = "【密码】不能为空")
+    @NotEmpty(message = "【密码】不能为空")
 //    @Length(min = 6, max = 20, message = "【密码】6~32位")
     @Pattern(regexp = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,32}$", message = "【密码】规则不正确")//长度校验
     private String password;

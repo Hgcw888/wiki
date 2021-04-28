@@ -12,6 +12,9 @@ public class EuserLoginResp {
     private String loginName;
 
     private String name;
+    //用于返回给前端，登录时长，以及清除token退出
+    private String token;
+
 
     @Override
     public String toString() {

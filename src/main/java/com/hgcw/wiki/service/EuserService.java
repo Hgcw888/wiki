@@ -1,9 +1,11 @@
 package com.hgcw.wiki.service;
 
 import com.hgcw.wiki.domin.Euser;
+import com.hgcw.wiki.req.EuserLoginReq;
 import com.hgcw.wiki.req.EuserQueryReq;
 import com.hgcw.wiki.req.EuserResetPasswordReq;
 import com.hgcw.wiki.req.EuserSaveReq;
+import com.hgcw.wiki.resp.EuserLoginResp;
 import com.hgcw.wiki.resp.EuserQueryResp;
 import com.hgcw.wiki.resp.PageResp;
 
@@ -25,4 +27,6 @@ public interface EuserService {
     void updateEuser(EuserSaveReq euserSaveReq);
 
     Euser selectLogName(String loginName);
+
+    EuserLoginResp login(EuserLoginReq euserLoginReq);
 }

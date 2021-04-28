@@ -2,3 +2,9 @@ GET http://localhost:8080/euser/dimSelect?loginName=test
 Accept: application/json
 
 ###
+POST http://localhost:8080/euser/login
+Content-Type: application/x-www-form-urlencoded
+
+loginName=test&password=test123
+
+###
