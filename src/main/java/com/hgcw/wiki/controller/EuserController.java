@@ -71,8 +71,10 @@ public class EuserController {
 
     /**
      * 删除电子书
+     *
+     * @PathVariable映射{id}到Long id
      */
-    @DeleteMapping("delectEuser/{id}")
+    @DeleteMapping("/delectEuser/{id}")
     public CommonResp delectEuser(@PathVariable Long id) {
         CommonResp objectCommonResp = new CommonResp<>();
         euserService.delectEuser(id);
@@ -118,8 +120,20 @@ public class EuserController {
         log.info("生成的token：{}", token);
         euserLoginResp.setToken(token.toString());
         //放入redis。set方法以token为key，euserLoginResp对象为数据，后面为时间
-        stringRedisTemplate.opsForValue().set(String.format(TOKEN_SUECCSS,euserLoginResp.getId()), JSONObject.toJSONString(euserLoginResp), 3600 * 4, TimeUnit.SECONDS);
+        stringRedisTemplate.opsForValue().set(String.format(TOKEN_SUECCSS, euserLoginResp.getId()), JSONObject.toJSONString(euserLoginResp), 3600 * 4, TimeUnit.SECONDS);
         objectCommonResp.setContent(euserLoginResp);
+        return objectCommonResp;
+    }
+
+    /**
+     * 退出登录
+     */
+    @GetMapping("/logout/{token}")
+    public CommonResp delectEuser(@PathVariable String token) {
+        CommonResp objectCommonResp = new CommonResp<>();
+        //直接调用stringRedisTemplate的delete方法删除token，从redis中清除
+        stringRedisTemplate.delete(token);
+        log.info("从redis中清除;{}",token);
         return objectCommonResp;
     }
 }

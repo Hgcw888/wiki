@@ -23,9 +23,21 @@
         <router-link to="/about">关于我们</router-link>
       </a-menu-item>
 
+
+      <a-popconfirm
+          title="确认退出登录"
+          ok-text="是"
+          cancel-text="否"
+          @confirm="logout()"
+      >
+        <a class="login-menu" v-show="euser.id">
+          <span>退出登录</span>
+        </a>
+      </a-popconfirm>
       <a class="login-menu" v-show="euser.id">
         <span>您好：{{ euser.name }}</span>
       </a>
+
       <a class="login-menu" v-show="!euser.id" @click="showLoginModal">
         <span>登录</span>
       </a>
@@ -93,8 +105,6 @@ export default defineComponent({
           //有值代表成功了，关闭弹框
           loginModalVisible.value = false;
           message.success("登陆成功");
-
-
           //将登录这的信息赋值到全局变量,传入setEuser方法
           store.commit("setEuser", data.content);
 
@@ -103,6 +113,25 @@ export default defineComponent({
         }
       });
     };
+
+    /**
+     * 登出
+     */
+    const logout = () => {
+      console.log("开始登出")
+      axios.get('/euser/logout/' + euser.value.token).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          message.success("登出成功");
+          //登出后传入空值到全局变量,传入setEuser方法
+          store.commit("setEuser", {});
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
+
     return {
       loginEuser,
       loginModalVisible,
@@ -110,6 +139,7 @@ export default defineComponent({
       euser,
       showLoginModal,
       login,
+      logout,
 
     }
   }
@@ -120,5 +150,6 @@ export default defineComponent({
 .login-menu {
   float: right;
   color: white;
+  padding-left:20px ;
 }
 </style>
