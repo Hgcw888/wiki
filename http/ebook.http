@@ -13,5 +13,14 @@ GET http://localhost:8080/api/dimSelect?page=1&size=1000&category2Id=101
 Accept: application/json
 
 ###
-GET http://localhost:8080/category/dimSelect?page=1&size=1000
+GET http://localhost:8080/api/dimSelect?page=1&size=1000
 Accept: application/json
+
+###
+POST http://localhost:8080/api/updateEbook
+Content-Type: application/x-www-form-urlencoded
+
+id=8&name=123
+
+###
+

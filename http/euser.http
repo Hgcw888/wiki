@@ -8,3 +8,9 @@ Content-Type: application/x-www-form-urlencoded
 loginName=test&password=test123
 
 ###
+POST http://localhost:8080/euser/updateEuser
+Content-Type: application/x-www-form-urlencoded
+
+id=332184245994528&name=555
+
+###

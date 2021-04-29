@@ -24,7 +24,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
     /**
-     * 不使用分页查询列表
+     * 不使用分页查询列表菜单栏用到
      * @param
      * @return
      */

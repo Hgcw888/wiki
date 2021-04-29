@@ -120,7 +120,7 @@ public class EuserController {
         log.info("生成的token：{}", token);
         euserLoginResp.setToken(token.toString());
         //放入redis。set方法以token为key，euserLoginResp对象为数据，后面为时间
-        stringRedisTemplate.opsForValue().set(String.format(TOKEN_SUECCSS, euserLoginResp.getId()), JSONObject.toJSONString(euserLoginResp), 3600 * 4, TimeUnit.SECONDS);
+        stringRedisTemplate.opsForValue().set(token.toString(), JSONObject.toJSONString(euserLoginResp), 3600 * 4, TimeUnit.SECONDS);
         objectCommonResp.setContent(euserLoginResp);
         return objectCommonResp;
     }
