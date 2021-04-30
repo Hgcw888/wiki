@@ -22,6 +22,7 @@
               <span>阅读数：{{ doc.viewCount }}</span> &nbsp; &nbsp;
               <span>点赞数：{{ doc.voteCount }}</span>
             </div>
+<!--            分割线-->
             <a-divider style="height: 2px; background-color: #9999cc"/>
           </div>
           <div class="wangeditor" :innerHTML="html"></div>
@@ -54,7 +55,7 @@ export default defineComponent({
     // 进入文档编辑页面默认选中初始化变量
     const defaultSelectedKeys = ref();
     defaultSelectedKeys.value = [];
-    // 当前选中的文档
+    // 当前选中的文档,显示阅读数和点赞数
     const doc = ref();
     doc.value = {};
 
@@ -106,7 +107,8 @@ export default defineComponent({
             defaultSelectedKeys.value = [level1.value[0].id];
             //选中或调用方法查询
             handleQueryContent(level1.value[0].id);
-            // 初始显示文档信息
+
+            // 初始显示文档信息（将第一个选中节点阅读数和点赞数赋值）
             doc.value = level1.value[0];
           }
         } else {

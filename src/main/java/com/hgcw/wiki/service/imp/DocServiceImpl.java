@@ -151,7 +151,14 @@ public class DocServiceImpl implements DocService {
     @Override
     public String findContent(Long id) {
         Content content = contentMapper.selectByPrimaryKey(id);
-        return content.getContent();
+        //点击查看文档是阅读数+1
+        docMapper.updateViewCount(id);
+        if (ObjectUtils.isEmpty(content)) {
+            return "";
+        }else {
+            return content.getContent();
+        }
+
     }
 
 
