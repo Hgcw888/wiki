@@ -28,9 +28,9 @@ public class DocController {
      * @param
      * @return
      */
-    @GetMapping("/selectList")
-    public CommonResp selectList() {
-        List<DocQueryResp> docs = docService.selectList();
+    @GetMapping("/selectList/{ebookId}")
+    public CommonResp selectList(@PathVariable Long ebookId) {
+        List<DocQueryResp> docs = docService.selectList(ebookId);
         CommonResp<List<DocQueryResp>> objectCommonResp = new CommonResp<>();
         objectCommonResp.setContent(docs);
         return objectCommonResp;
@@ -70,5 +70,21 @@ public class DocController {
         CommonResp resp = new CommonResp<>();
         docService.updateDoc(docQueryReq);
         return resp;
+    }
+
+
+    /**
+     * 根据ID查询
+     *
+     * @param
+     * @return
+     *
+     */
+    @GetMapping("/find-content/{id}")
+    public CommonResp findContent(@PathVariable Long id) {
+        String content = docService.findContent(id);
+        CommonResp<String> objectCommonResp = new CommonResp<>();
+        objectCommonResp.setContent(content);
+        return objectCommonResp;
     }
 }

@@ -10,13 +10,13 @@
       <a-menu-item key="/">
         <router-link to="/">首页</router-link>
       </a-menu-item>
-      <a-menu-item key="/admin/euser">
+      <a-menu-item key="/admin/euser" :style="euser.id ? {}:{ display: 'none'}">
         <router-link to="/admin/euser">用户管理</router-link>
       </a-menu-item>
-      <a-menu-item key="/admin/ebook">
+      <a-menu-item key="/admin/ebook" :style="euser.id ? {} :{ display:'none'}">
         <router-link to="/admin/ebook">电子书管理</router-link>
       </a-menu-item>
-      <a-menu-item key="/admin/category">
+      <a-menu-item key="/admin/category" :style="euser.id ? {} :{display:'none'}">
         <router-link to="/admin/category">分类管理</router-link>
       </a-menu-item>
       <a-menu-item key="about">
@@ -150,6 +150,6 @@ export default defineComponent({
 .login-menu {
   float: right;
   color: white;
-  padding-left:20px ;
+  padding-left: 20px;
 }
 </style>

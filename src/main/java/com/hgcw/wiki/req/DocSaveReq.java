@@ -20,9 +20,12 @@ public class DocSaveReq {
 
     private Integer voteCount;
 
+    @NotNull(message = "【内容】不能为空")
+    private String content;
+
     @Override
     public String toString() {
-        return "DocQueryResp{" +
+        return "DocSaveReq{" +
                 "id=" + id +
                 ", ebookId=" + ebookId +
                 ", parent=" + parent +
@@ -30,6 +33,7 @@ public class DocSaveReq {
                 ", sort=" + sort +
                 ", viewCount=" + viewCount +
                 ", voteCount=" + voteCount +
+                ", content='" + content + '\'' +
                 '}';
     }
 }

@@ -27,14 +27,14 @@
           <!--      row-key="record => record.id"指定键位，拿到数据与id-->
           <!--          :defaultExpandAllRows="true"  :key={tableKey}进入页面时和刷新时节点类展开，需要两个一起加-->
           <a-table
-                   :columns="columns"
-                   :row-key="record => record.id"
-                   :data-source="level1"
-                   :loading="loading"
-                   :pagination="false"
-                   size="small"
-                   :key={tableKey}
-                   :defaultExpandAllRows="true"
+              :columns="columns"
+              :row-key="record => record.id"
+              :data-source="level1"
+              :loading="loading"
+              :pagination="false"
+              size="small"
+              :key={tableKey}
+              :defaultExpandAllRows="true"
           >
             <!--  将路径渲染成图片封面图片cover-->
             <template #name="{ text,record}">
@@ -92,29 +92,26 @@
               >
               </a-tree-select>
             </a-form-item>
-            <!--            <a-form-item label="父文档">-->
-            <!--              &lt;!&ndash;        <a-input v-model:value="doc.parent"/>&ndash;&gt;-->
-            <!--              <a-select-->
-            <!--                  v-model:value="doc.parent"-->
-            <!--                  ref="select"-->
-            <!--              >-->
-            <!--                <a-select-option value="0">-->
-            <!--                  无-->
-            <!--                </a-select-option>-->
-            <!--                <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="doc.id === c.id">{{ c.name }}-->
-            <!--                </a-select-option>-->
-            <!--              </a-select>-->
-            <!--            </a-form-item>-->
+
             <a-form-item>
               <a-input v-model:value="doc.sort" placeholder="排序"/>
             </a-form-item>
+
+            <a-form-item>
+              <a-button type="primary" @click="handlePreviewContent()">
+                <EyeQutlined/>内容预览
+              </a-button>
+            </a-form-item>
+
             <a-form-item>
               <div id="content"/>
             </a-form-item>
           </a-form>
         </a-col>
       </a-row>
-
+      <a-drawer width="900" placement="right" :closable="false" :visible="drawerVisible" @close="onDrawerClose">
+        <div class="wangeditor" :innerHTML="previewHtml"></div>
+      </a-drawer>
     </a-layout-content>
   </a-layout>
   <!--  <a-modal-->
@@ -154,6 +151,10 @@ export default defineComponent({
 //定义m默认延迟加载
     const loading = ref(false);
 
+    //因为树选择主键的树形状态，会随着当前编辑的节点而变化，所有单独
+    const treeSelectData = ref();
+    treeSelectData.value = [];
+
     const columns = [
 
       {
@@ -187,10 +188,12 @@ export default defineComponent({
      * @param params
      */
     const handleQuery = () => {
+
+      editor.txt.html("");
       loading.value = true;
       //情况数据，如果不情况现有的数据，则编辑报错从新加载后，在点击编辑，则列表显示的还是编辑签的数据
       level1.value = [];
-      axios.get("/doc/selectList").then((response) => {
+      axios.get("/doc/selectList/" + route.query.ebookId).then((response) => {
         loading.value = false;
         const date = response.data;
         //判断符合实体类中的参数校验
@@ -201,6 +204,10 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value, 0);
           console.log("树形结构:", level1);
+          //父类文档下拉初始化，相当于点击新增
+          treeSelectData.value = Tool.copy(level1.value);
+          //选择树添加一个‘无’
+          treeSelectData.value.unshift({id: 0, name: '无'})
         } else {
           //如果没有的话返回实体类错误提示
           message.error(date.message)
@@ -240,16 +247,20 @@ export default defineComponent({
      * 表单弹框
      * doc接受表单回传数据
      */
-    const treeSelectData = ref();
-    treeSelectData.value = [];
-    const doc = ref({});
+
+    const doc = ref();
+    doc.value = {
+      //初始化就获取ID，避免需要点击新增
+      ebookId: route.query.ebookId
+    };
     const modelVisible = ref(false)//框
     const modelLoading = ref(false)
     const editor = new E("#content");//富文本容器
     editor.config.zIndex = 0;
 
     const handleSave = () => {
-
+      //获取超链接中的html就是文档内容
+      doc.value.content = editor.txt.html();
       modelLoading.value = true;
       axios.post("/doc/updateDoc", doc.value).then((response) => {
         //有返回数据的话就关闭modelLoading
@@ -257,7 +268,9 @@ export default defineComponent({
         const data = response.data//commonResp数据
         //判断符合实体类中的参数校验
         if (data.success) {
-          modelVisible.value = false;//框
+
+
+          message.success("编辑成功")
           //添加成功后从新调用获取列表方法
           handleQuery();
         } else {
@@ -266,14 +279,37 @@ export default defineComponent({
         }
       });
     };
+
+
+    /**
+     * 文档内容查询
+     * */
+    const handleQueryContent = () => {
+
+      axios.get("/doc/find-content/" + doc.value.id).then((response) => {
+        const date = response.data;
+        //判断符合实体类中的参数校验
+        if (date.success) {
+          // 赋值给富文本
+          editor.txt.html(date.content)
+        } else {
+          //如果没有的话返回实体类错误提示
+          message.error(date.message)
+        }
+      });
+    };
+
+
     /**
      * 编辑
      * 将表单接收的到的参数record赋值到doc中
      */
     const edit = (record: any) => {
-
+      //先清空富文本框数据
+      editor.txt.html("");
       modelVisible.value = true
       doc.value = Tool.copy(record);
+      handleQueryContent();
       //不能选择当前节点所有子节点作为父节点，不然会使树断开
       treeSelectData.value = Tool.copy(level1.value);
       setDisable(treeSelectData.value, record.id)
@@ -355,7 +391,8 @@ export default defineComponent({
      * 表单为空数组，来接收docs填入的参数
      */
     const add = () => {
-
+      //先清空富文本框数据
+      editor.txt.html("");
       modelVisible.value = true
       doc.value = {
         //获取路由传第的信息获取电子书的id
@@ -371,7 +408,17 @@ export default defineComponent({
 
     };
 
-
+    // ----------------富文本预览--------------
+    const drawerVisible = ref(false);
+    const previewHtml = ref();
+    const handlePreviewContent = () => {
+      const html = editor.txt.html();
+      previewHtml.value = html;
+      drawerVisible.value = true;
+    };
+    const onDrawerClose = () => {
+      drawerVisible.value = false;
+    };
     //初始化去查询
     onMounted(() => {
       handleQuery();
@@ -393,6 +440,10 @@ export default defineComponent({
       handleDelete,
       handleQuery,
       handleSave,
+      drawerVisible,
+      previewHtml,
+      handlePreviewContent,
+      onDrawerClose,
     }
   }
 });

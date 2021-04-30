@@ -2,8 +2,10 @@ package com.hgcw.wiki.service.imp;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.hgcw.wiki.domin.Content;
 import com.hgcw.wiki.domin.Doc;
 import com.hgcw.wiki.domin.DocExample;
+import com.hgcw.wiki.mapper.ContentMapper;
 import com.hgcw.wiki.mapper.DocMapper;
 import com.hgcw.wiki.req.DocQueryReq;
 import com.hgcw.wiki.req.DocSaveReq;
@@ -27,12 +29,15 @@ public class DocServiceImpl implements DocService {
     @Autowired
     private DocMapper docMapper;
     @Autowired
+    private ContentMapper contentMapper;
+    @Autowired
     private SnowFlake snowFlake;
 
 
     @Override
-    public List<DocQueryResp> selectList() {
+    public List<DocQueryResp> selectList(Long ebookId) {
         DocExample docExample = new DocExample();
+        docExample.createCriteria().andEbookIdEqualTo(ebookId);
         docExample.setOrderByClause("sort asc");
         List<Doc> docsList = docMapper.selectByExample(docExample);
 
@@ -90,7 +95,7 @@ public class DocServiceImpl implements DocService {
     /**
      * 删除文档,删除父节点的时候需要将其子类一起删掉
      *
-     * @param 
+     * @param
      */
     @Override
     public void delectDoc(List<String> ids) {
@@ -102,23 +107,52 @@ public class DocServiceImpl implements DocService {
 
 
     /**
-     * 更新和添加文档
+     * 更新和添加文档。因为文档内容在不同表中，所有同事也要插入content表中
      *
      * @param
      */
     @Override
     public void updateDoc(DocSaveReq docQueryReq) {
-        //方法参数类型不同需要转换
+        //方法参数类型不同需要转换（添加文档）
         Doc doc = CopyUtil.copy(docQueryReq, Doc.class);
+        //方法参数类型不同需要转换（添加文档内容）
+        Content content = CopyUtil.copy(docQueryReq, Content.class);
         if (ObjectUtils.isEmpty(docQueryReq.getId())) {
             //传入的id为空的为新增
             //新增对象id有三种：id自增，uuid，雪花算法新增
             doc.setId(snowFlake.nextId());
+            //insert方法字段没有数据时添加null进去，所有点赞，和阅读书需要相加所有初始要是0
+            doc.setViewCount(0);
+            doc.setVoteCount(0);
             docMapper.insert(doc);
+
+            //添加文档内容
+            content.setId(doc.getId());
+            contentMapper.insert(content);
         } else {
             //否则为更新
             docMapper.updateByPrimaryKey(doc);
+            //更新文档内容updateByPrimaryKeyWithBLOBs方法更新包含大文档
+            int i = contentMapper.updateByPrimaryKeyWithBLOBs(content);
+            //如果更新是文档内容原先是空的就插入
+            if (i == 0) {
+                contentMapper.insert(content);
+            }
+
         }
 
     }
+
+    /**
+     * 查询文档内容
+     * @param id
+     * @return
+     */
+    @Override
+    public String findContent(Long id) {
+        Content content = contentMapper.selectByPrimaryKey(id);
+        return content.getContent();
+    }
+
+
 }

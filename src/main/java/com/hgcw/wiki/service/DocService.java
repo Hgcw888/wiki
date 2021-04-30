@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface DocService {
 
-    List<DocQueryResp> selectList();
+    List<DocQueryResp> selectList(Long ebookId);
 
     PageResp<DocQueryResp> dimSelect(DocQueryReq req);
 
@@ -22,4 +22,6 @@ public interface DocService {
     void delectDoc(List<String> ids);
 
     void updateDoc(DocSaveReq docQueryReq);
+
+    String findContent(Long id);
 }
