@@ -6,6 +6,7 @@ import com.hgcw.wiki.resp.DocQueryResp;
 import com.hgcw.wiki.resp.CommonResp;
 import com.hgcw.wiki.resp.PageResp;
 import com.hgcw.wiki.service.DocService;
+import com.hgcw.wiki.util.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,5 +87,20 @@ public class DocController {
         CommonResp<String> objectCommonResp = new CommonResp<>();
         objectCommonResp.setContent(content);
         return objectCommonResp;
+    }
+
+
+    /**
+     * 点赞
+     *
+     * @param
+     * @return
+     *
+     */
+    @GetMapping("/vote/{id}")
+    public CommonResp Innervote(@PathVariable Long id) {
+        docService.Innervote(id);
+        CommonResp objectCommonResp1 = new CommonResp<>();
+        return objectCommonResp1;
     }
 }

@@ -26,6 +26,7 @@
             <a-divider style="height: 2px; background-color: #9999cc"/>
           </div>
           <div class="wangeditor" :innerHTML="html"></div>
+<!--         点赞-->
           <div class="vote-div">
             <a-button type="primary" shape="round" :size="'large'" @click="vote">
               <template #icon>

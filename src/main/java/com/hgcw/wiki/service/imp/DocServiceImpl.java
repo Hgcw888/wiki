@@ -5,6 +5,8 @@ import com.github.pagehelper.PageInfo;
 import com.hgcw.wiki.domin.Content;
 import com.hgcw.wiki.domin.Doc;
 import com.hgcw.wiki.domin.DocExample;
+import com.hgcw.wiki.exception.BusinessException;
+import com.hgcw.wiki.exception.BusinessExceptionCode;
 import com.hgcw.wiki.mapper.ContentMapper;
 import com.hgcw.wiki.mapper.DocMapper;
 import com.hgcw.wiki.req.DocQueryReq;
@@ -13,7 +15,10 @@ import com.hgcw.wiki.resp.DocQueryResp;
 import com.hgcw.wiki.resp.PageResp;
 import com.hgcw.wiki.service.DocService;
 import com.hgcw.wiki.util.CopyUtil;
+import com.hgcw.wiki.util.RedisUtil;
+import com.hgcw.wiki.util.RequestContext;
 import com.hgcw.wiki.util.SnowFlake;
+import io.lettuce.core.dynamic.annotation.Key;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -32,6 +37,11 @@ public class DocServiceImpl implements DocService {
     private ContentMapper contentMapper;
     @Autowired
     private SnowFlake snowFlake;
+    /**
+     * RedisUtil redis中key的校验工具类
+     */
+    @Autowired
+    private RedisUtil redisUtil;
 
 
     @Override
@@ -80,6 +90,7 @@ public class DocServiceImpl implements DocService {
 
         return pageResp;
     }
+
 
     /**
      * 删除文档
@@ -145,6 +156,7 @@ public class DocServiceImpl implements DocService {
 
     /**
      * 查询文档内容
+     *
      * @param id
      * @return
      */
@@ -155,10 +167,36 @@ public class DocServiceImpl implements DocService {
         docMapper.updateViewCount(id);
         if (ObjectUtils.isEmpty(content)) {
             return "";
-        }else {
+        } else {
             return content.getContent();
         }
 
+    }
+
+    /**
+     * 点赞
+     *
+     * @param id
+     */
+    @Override
+    public void Innervote(Long id) {
+        //获取远程ip后用ip+doc.id 作为key，24小时内不能重复
+        //获取ip
+        String key = RequestContext.getRemoteAddr();
+        //redisUtil工具类的validateRepeat方法查询redis中是否有该key没有就添加，有就throw
+        if (redisUtil.validateRepeat("DOC_VOTE_" + id + "_" + key, 3600 * 24)) {
+            docMapper.updateVote(id);
+        } else {
+            throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
+        }
+    }
+
+    /**
+     * 隔段时间统计更新，电子数，点赞数，阅读数使用到DocJob工具类定时器，到DocJob工具类调用方法
+     */
+    @Override
+    public void updateEbookInfo() {
+        docMapper.updateEbookInfo();
     }
 
 

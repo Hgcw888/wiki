@@ -17,6 +17,8 @@ public interface DocService {
 
     PageResp<DocQueryResp> dimSelect(DocQueryReq req);
 
+    void updateEbookInfo();
+
     void delectDoc(Long id);
 
     void delectDoc(List<String> ids);
@@ -24,4 +26,6 @@ public interface DocService {
     void updateDoc(DocSaveReq docQueryReq);
 
     String findContent(Long id);
+
+    void Innervote(Long id);
 }
