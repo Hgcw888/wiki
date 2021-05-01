@@ -99,7 +99,8 @@
 
             <a-form-item>
               <a-button type="primary" @click="handlePreviewContent()">
-                <EyeQutlined/>内容预览
+                <EyeQutlined/>
+                内容预览
               </a-button>
             </a-form-item>
 
@@ -204,8 +205,8 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value, 0);
           console.log("树形结构:", level1);
-          //父类文档下拉初始化，相当于点击新增
-          treeSelectData.value = Tool.copy(level1.value);
+          //父类文档下拉初始化，相当于点击新增，有值或者空的时候为选择树添加一个"无"
+          treeSelectData.value = Tool.copy(level1.value) || [];
           //选择树添加一个‘无’
           treeSelectData.value.unshift({id: 0, name: '无'})
         } else {
@@ -398,14 +399,10 @@ export default defineComponent({
         //获取路由传第的信息获取电子书的id
         ebookId: route.query.ebookId
       };
-      treeSelectData.value = Tool.copy(level1.value);
-
-      //作为选择树添加一个“无”
+      //有值或者空的时候为选择树添加一个"无"
+      treeSelectData.value = Tool.copy(level1.value) || [];
+      // 为选择树添加一个"无"
       treeSelectData.value.unshift({id: 0, name: '无'});
-      // setTimeout(function () {
-      //   editor.create();//创建文本
-      // }, 100);
-
     };
 
     // ----------------富文本预览--------------

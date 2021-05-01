@@ -30,6 +30,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
                         "/euser/dimSelect/**",
                         "/categoty/dimSelect",
                         "/doc/selectList",
+                        "/doc/vote/**",
                         "/categoty/selectList"
                 );
 //
