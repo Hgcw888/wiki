@@ -1,13 +1,16 @@
 package com.hgcw.wiki.job;
 
 import com.hgcw.wiki.mapper.DocMapper;
+import com.hgcw.wiki.util.SnowFlake;
 import lombok.extern.slf4j.Slf4j;
+import org.jboss.logging.MDC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -19,6 +22,8 @@ import java.util.Date;
 public class DocJob {
     @Autowired
     private DocMapper docMapper;
+    @Resource
+    private SnowFlake snowFlake;
 
 
     private static final Logger LOG = LoggerFactory.getLogger(DocJob.class);
@@ -40,6 +45,9 @@ public class DocJob {
      */
     @Scheduled(cron = "5/30 * * * * ?")//没分钟的第五秒开始执行隔30秒执行一次：可到cron表达式网站
     public void cron() {
+        //与logback-spring.xml结合使用。增加日志流水号，同一个流水号的日记就是同一个业务
+        MDC.put("LOGGING_ID", String.valueOf(snowFlake.nextId()));
+
         LOG.info("更新电子书下的文档、点赞、阅读数的数据开始");
         //获取当前毫秒
         long l = System.currentTimeMillis();
