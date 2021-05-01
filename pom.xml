@@ -18,6 +18,12 @@
     </properties>
 
     <dependencies>
+<!--        websocket依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
 <!--        整合Redis-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
