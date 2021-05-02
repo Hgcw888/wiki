@@ -3,6 +3,7 @@ package com.hgcw.wiki;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -13,6 +14,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @MapperScan("com.hgcw.wiki.mapper")
 //启用定时任务
 @EnableScheduling
+//异步
+@EnableAsync
 public class WikiApplication {
 
     public static void main(String[] args) {

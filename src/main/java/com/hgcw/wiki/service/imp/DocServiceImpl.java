@@ -18,11 +18,17 @@ import com.hgcw.wiki.util.CopyUtil;
 import com.hgcw.wiki.util.RedisUtil;
 import com.hgcw.wiki.util.RequestContext;
 import com.hgcw.wiki.util.SnowFlake;
+import com.hgcw.wiki.websocket.WebSocketServer;
 import io.lettuce.core.dynamic.annotation.Key;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -42,7 +48,19 @@ public class DocServiceImpl implements DocService {
      */
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
+    @Resource
+    private WsService wsService;
+
+    /**
+     * rocketma的模板类
+     * @param ebookId
+     * @return
+     */
+    @Resource
+    private RocketMQTemplate rocketMQTemplate;
 
     @Override
     public List<DocQueryResp> selectList(Long ebookId) {
@@ -122,6 +140,7 @@ public class DocServiceImpl implements DocService {
      *
      * @param
      */
+    @Transactional
     @Override
     public void updateDoc(DocSaveReq docQueryReq) {
         //方法参数类型不同需要转换（添加文档）
@@ -189,6 +208,13 @@ public class DocServiceImpl implements DocService {
         } else {
             throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
         }
+        //调用异步方法
+        Doc doc = docMapper.selectByPrimaryKey(id);
+        //获取线程号，知道异步推送的消息是哪个进程
+        String loggingId = MDC.get("LOGGING_ID");
+        //wsService.sendInfo("【" + doc.getName() + "】被点赞", loggingId);
+        //发送使用recketMQ
+        rocketMQTemplate.convertAndSend("VOTE_TOPIC","【" + doc.getName() + "】被点赞");
     }
 
     /**

@@ -8,7 +8,7 @@ import {computed, defineComponent, onMounted} from 'vue';
 import store from '@/store';
 import {Tool} from "@/util/tool";
 import { notification } from 'ant-design-vue';
-
+import {message} from 'ant-design-vue';
 
 
 export default defineComponent({
@@ -23,6 +23,7 @@ export default defineComponent({
     };
     const onMessage = (event: any) => {
       console.log('WebSocket收到消息：', event.data);
+
       notification['info']({
         message: '收到消息',
         description: event.data,
