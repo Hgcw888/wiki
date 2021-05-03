@@ -3,13 +3,13 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: Aa123456
-    url: jdbc:mysql://localhost:3306/all?characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://localhost:3306/all?characterEncoding=utf-8&serverTimezone=GMT%2B8&allowMultiQueries=true
   redis:
     host: localhost
     port: 6379
 server:
   port: 8080
-
+#allowMultiQueries=true：xml文件一个方法中运行多个sql方法
 #配置rocketma
 rocketmq:
   name-server: localhost:9876
