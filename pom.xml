@@ -98,6 +98,8 @@
     </dependencies>
 
     <build>
+<!--        打包文件目录以及打包名称-->
+        <finalName>/dist/${artifactId}</finalName>
         <plugins>
 <!--            gennrator生成-->
             <plugin>

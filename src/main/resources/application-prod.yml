@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 15177992761Hgcw!
+    url: jdbc:mysql://47.115.72.64:3306/all?characterEncoding=utf-8&serverTimezone=GMT%2B8&allowMultiQueries=true
+  redis:
+    host: localhost
+    port: 6379
+server:
+  port: 8080
+#allowMultiQueries=true：xml文件一个方法中运行多个sql方法
+#配置rocketma
+rocketmq:
+  name-server: localhost:9876
+  producer:
+    group: default
+
+#logging:
+#  pattern:
+#    console: "[%thread] %-5level %logger{36} - %msg%n"
+
+#配置mybatis所有mapper.xml所在的文件路肩
+mybatis:
+  mapper-locations: classpath:/mapper/**/*.xml
+#打印所有mysql日志：sql，参数，结果
+logging:
+  pattern:
+    console: "[%thread] %-5level %logger{36} - %msg%n"
+  level:
+    com.hgcw.wiki.mapper: trace
